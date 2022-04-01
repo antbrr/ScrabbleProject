@@ -985,39 +985,39 @@
       "FSharp.Core >= 6.0.3",
       "Oxyphenbutazone >= 1.0.11",
       "ScrabbleServer >= 1.0.19",
+      "ScrabbleUtil >= 1.0.12",
       "YourIdGoesHere >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\AMBre\\.nuget\\packages\\": {}
+    "/Users/adrian/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\AMBre\\scrabble\\ScrabbleProject\\ScrabbleTemplate\\ScrabbleTemplate\\ScrabbleTemplate.fsproj",
+      "projectUniqueName": "/Users/adrian/Documents/ITU/4_Semester/Funktionel Programmering/ScrabbleProject/ScrabbleTemplate/ScrabbleTemplate/ScrabbleTemplate.fsproj",
       "projectName": "ScrabbleTemplate",
-      "projectPath": "C:\\Users\\AMBre\\scrabble\\ScrabbleProject\\ScrabbleTemplate\\ScrabbleTemplate\\ScrabbleTemplate.fsproj",
-      "packagesPath": "C:\\Users\\AMBre\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\AMBre\\scrabble\\ScrabbleProject\\ScrabbleTemplate\\ScrabbleTemplate\\obj\\",
+      "projectPath": "/Users/adrian/Documents/ITU/4_Semester/Funktionel Programmering/ScrabbleProject/ScrabbleTemplate/ScrabbleTemplate/ScrabbleTemplate.fsproj",
+      "packagesPath": "/Users/adrian/.nuget/packages/",
+      "outputPath": "/Users/adrian/Documents/ITU/4_Semester/Funktionel Programmering/ScrabbleProject/ScrabbleTemplate/ScrabbleTemplate/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\AMBre\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/adrian/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://nuget.pkg.github.com/jesper-bengtson/index.json": {}
+        "https://nuget.pkg.github.com/jesper-bengtson/index.json": {},
+        "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\AMBre\\scrabble\\ScrabbleProject\\ScrabbleTemplate\\ScrabbleBot\\ScrabbleBot.fsproj": {
-              "projectPath": "C:\\Users\\AMBre\\scrabble\\ScrabbleProject\\ScrabbleTemplate\\ScrabbleBot\\ScrabbleBot.fsproj"
+            "/Users/adrian/Documents/ITU/4_Semester/Funktionel Programmering/ScrabbleProject/ScrabbleTemplate/ScrabbleBot/ScrabbleBot.fsproj": {
+              "projectPath": "/Users/adrian/Documents/ITU/4_Semester/Funktionel Programmering/ScrabbleProject/ScrabbleTemplate/ScrabbleBot/ScrabbleBot.fsproj"
             }
           }
         }
@@ -1042,6 +1042,11 @@
             "target": "Package",
             "version": "[1.0.19, )",
             "generatePathProperty": true
+          },
+          "ScrabbleUtil": {
+            "target": "Package",
+            "version": "[1.0.12, )",
+            "generatePathProperty": true
           }
         },
         "imports": [
@@ -1059,7 +1064,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.100-preview.3.21202.5/RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -7,7 +7,7 @@
     <description>Scrabble Bot for Functional Programming 2022
 
 Group name: &lt;Your group name goes here&gt; (optional since this is hosted in a public Github repository)</description>
-    <repository url="https://github.com/jesper-bengtson/Scrabble-FP2022/" />
+    <repository url="https://github.com/jesper-bengtson/Scrabble-FP2021/" />
     <dependencies>
       <group targetFramework="net6.0">
         <dependency id="FParsec" version="1.1.1" exclude="Build,Analyzers" />
@@ -17,6 +17,6 @@ Group name: &lt;Your group name goes here&gt; (optional since this is hosted in 
     </dependencies>
   </metadata>
   <files>
-    <file src="C:\Users\AMBre\scrabble\ScrabbleProject\ScrabbleTemplate\ScrabbleBot\bin\Debug\net6.0\YourIdGoesHere.dll" target="lib\net6.0\YourIdGoesHere.dll" />
+    <file src="/Users/adrian/Documents/ITU/4_Semester/Funktionel Programmering/ScrabbleProject/ScrabbleTemplate/ScrabbleBot/bin/Debug/net6.0/YourIdGoesHere.dll" target="lib/net6.0/YourIdGoesHere.dll" />
   </files>
 </package>

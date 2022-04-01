@@ -4,17 +4,17 @@
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\AMBre\.nuget\packages\</NuGetPackageFolders>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/adrian/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/adrian/.nuget/packages/</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
     <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.0.0</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="C:\Users\AMBre\.nuget\packages\" />
+    <SourceRoot Include="/Users/adrian/.nuget/packages/" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">C:\Users\AMBre\.nuget\packages\fsharp.core\6.0.3</PkgFSharp_Core>
-    <PkgScrabbleUtil Condition=" '$(PkgScrabbleUtil)' == '' ">C:\Users\AMBre\.nuget\packages\scrabbleutil\1.0.12</PkgScrabbleUtil>
-    <PkgFParsec Condition=" '$(PkgFParsec)' == '' ">C:\Users\AMBre\.nuget\packages\fparsec\1.1.1</PkgFParsec>
+    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/Users/adrian/.nuget/packages/fsharp.core/6.0.3</PkgFSharp_Core>
+    <PkgScrabbleUtil Condition=" '$(PkgScrabbleUtil)' == '' ">/Users/adrian/.nuget/packages/scrabbleutil/1.0.12</PkgScrabbleUtil>
+    <PkgFParsec Condition=" '$(PkgFParsec)' == '' ">/Users/adrian/.nuget/packages/fparsec/1.1.1</PkgFParsec>
   </PropertyGroup>
 </Project>
