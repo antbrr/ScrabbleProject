@@ -4,8 +4,30 @@ module internal Eval
 
     open StateMonad
 
-    let add a b = failwith "Not implemented"      
-    let div a b = failwith "Not implemented"      
+    let add (a:SM<int>) (b:SM<int>) = 
+        a >>= fun x -> 
+        b >>= fun y -> 
+        ret (x + y)
+
+    let sub a b =
+        a >>= fun x ->
+        b >>= fun y ->
+        ret (x - y)
+
+    let div a b =
+        a >>= fun x ->
+        b >>= fun y ->
+        if y <> 0 then ret (x / y) else fail DivisionByZero
+    
+    let mul a b =
+      a >>= fun x ->
+      b >>= fun y ->
+      ret (x * y)
+    
+    let modulo a b =
+        a >>= fun x ->
+        b >>= fun y ->
+        if y <> 0 then ret (x % y) else fail DivisionByZero
 
     type aExp =
         | N of int
@@ -37,7 +59,8 @@ module internal Eval
        | Conj of bExp * bExp  (* boolean conjunction *)
 
        | IsVowel of cExp      (* check for vowel *)
-       | IsConsonant of cExp  (* check for constant *)
+       | IsLetter of cExp     (* check for letter *)
+       | IsDigit of cExp      (* check for digit *)
 
     let (.+.) a b = Add (a, b)
     let (.-.) a b = Sub (a, b)
@@ -57,11 +80,41 @@ module internal Eval
     let (.>=.) a b = ~~(a .<. b)                (* numeric greater than or equal to *)
     let (.>.) a b = ~~(a .=. b) .&&. (a .>=. b) (* numeric greater than *)    
 
-    let arithEval a : SM<int> = failwith "Not implemented"      
+    let rec arithEval (a: aExp) : SM<int> = 
+        match a with
+        | N x -> ret (x)
+        | V s -> lookup s 
+        | WL -> wordLength
+        | PV pos ->  arithEval pos >>= pointValue
+        | Add (a,b) -> add (arithEval a) (arithEval b)
+        | Sub (a,b) -> sub (arithEval a) (arithEval b)
+        | Mul (a,b) -> mul (arithEval a) (arithEval b)
+        | Div (a,b) -> div (arithEval a) (arithEval b)
+        | Mod (a,b) -> modulo (arithEval a) (arithEval b)
+        | CharToInt c -> (charEval c) >>= fun x -> ret (int x)
 
-    let charEval c : SM<char> = failwith "Not implemented"      
+    and charEval c : SM<char> =
+        match c with
+        | C c -> ret (c) (* Character value *)
+        | CV pos -> arithEval pos >>= characterValue (* Character lookup at word index *)
+        | ToUpper c -> (charEval c) >>= fun c' -> charEval (C (System.Char.ToUpper c'))
+        | ToLower c -> (charEval c) >>= fun c' -> charEval (C (System.Char.ToLower c'))
+        | IntToChar a -> (arithEval a) >>= fun x -> ret (char x)
 
-    let boolEval b : SM<bool> = failwith "Not implemented"
+    let rec boolEval b : SM<bool> = 
+        match b with
+        | TT -> ret (true)
+        | FF -> ret (false)
+
+        | AEq (a,b) -> (arithEval a) >>= fun x -> (arithEval b) >>= fun y -> ret (x = y)
+        | ALt (a,b) -> (arithEval a) >>= fun x -> (arithEval b) >>= fun y -> ret (x < y)
+
+        | Not b -> (boolEval b) >>= fun b' -> ret (not b')
+        | Conj (a,b) -> (boolEval a) >>= fun x -> (boolEval b) >>= fun y -> ret (x && y)
+
+        | IsVowel c -> (charEval c) >>= fun c' -> ret ("AEIOUYaeiouy".Contains(c'))
+        | IsLetter c -> (charEval c) >>= fun c' -> ret (System.Char.IsLetter c')
+        | IsDigit c -> (charEval c) >>= fun c' -> ret (System.Char.IsDigit c')
 
 
     type stm =                (* statements *)
@@ -72,7 +125,15 @@ module internal Eval
     | ITE of bExp * stm * stm (* if-then-else statement *)
     | While of bExp * stm     (* while statement *)
 
-    let rec stmntEval stmnt : SM<unit> = failwith "Not implemented"
+    let rec stmntEval stmnt : SM<unit> = 
+        match stmnt with
+        | Declare str -> declare str
+        | Ass (str, a) -> (arithEval a) >>= fun a' -> update str a'
+        | Skip -> (stmntEval stmnt)
+        | Seq (stm1, stm2) -> (stmntEval stm1) >>>= (stmntEval stm2)
+        | ITE (guard, stm1, stm2) -> push >>>= (boolEval guard) >>= fun guard'-> if guard' then (stmntEval stm1) else (stmntEval stm2)
+        | While (guard, stm) -> push >>>= (boolEval guard) >>= fun guard' -> if guard' then (stmntEval (While (guard, stm))) else (stmntEval stm)
+
 
 (* Part 3 (Optional) *)
 
@@ -86,18 +147,117 @@ module internal Eval
         
     let prog = new StateBuilder()
 
-    let arithEval2 a = failwith "Not implemented"
-    let charEval2 c = failwith "Not implemented"
-    let rec boolEval2 b = failwith "Not implemented"
+   let rec arithEval2 a = 
+        match a with
+        | N x -> ret x
+        | V s -> lookup s 
+        | WL -> wordLength
+        | PV pos ->  prog{
+            let! pos' = (arithEval2 pos)
+            return! pointValue pos'
+            }
+        | Add (a,b) -> add (arithEval2 a) (arithEval2 b)
+        | Sub (a,b) -> sub (arithEval2 a) (arithEval2 b)
+        | Mul (a,b) -> mul (arithEval2 a) (arithEval2 b)
+        | Div (a,b) -> div (arithEval2 a) (arithEval2 b)
+        | Mod (a,b) -> modulo (arithEval2 a) (arithEval2 b)
+        | CharToInt c -> prog{
+            let! c' = (charEval2 c)
+            return int c'
+        }
+    
 
-    let stmntEval2 stm = failwith "Not implemented"
+    and charEval2 c =
+        match c with
+        | C c -> ret (c)
+        | CV pos -> prog{
+            let! pos' = (arithEval2 pos)
+            return! characterValue pos'
+            }
+        | ToUpper c -> prog{
+                let! c' = (charEval2 c)
+                return! charEval2 (C (System.Char.ToUpper c'))
+            }
+        | ToLower c -> prog{
+                let! c' = (charEval2 c)
+                return! charEval2 (C (System.Char.ToLower c'))
+            }
+        | IntToChar a -> prog{
+            let! a' = (arithEval2 a)
+            return char a'
+        }
+
+    let rec boolEval2 b = 
+        match b with
+        | TT -> ret true
+        | FF -> ret false
+
+        | AEq (a,b) -> prog{
+            let! a' = (arithEval2 a)
+            let! b' = (arithEval2 b)
+            return a' = b'
+            }
+        | ALt (a,b) -> prog{
+            let! a' = (arithEval2 a)
+            let! b' = (arithEval2 b)
+            return a' < b'
+            }
+
+        | Not b -> prog{
+            let! b' = (boolEval2 b)
+            return not b'
+            }
+
+        | Conj (a,b) -> prog{
+            let! a' = (boolEval2 a)
+            let! b' = (boolEval2 b)
+            return a' && b'
+            }
+
+        | IsVowel c -> prog{
+            let! c' = (charEval2 c)
+            return "AEIOUYaeiouy".Contains(c')
+            }
+        | IsLetter c -> prog{
+            let! c' = (charEval2 c)
+            return System.Char.IsLetter c'
+            }
+        | IsDigit c -> prog{
+            let! c' = (charEval2 c)
+            return System.Char.IsDigit c'
+            }
+
+    let rec stmntEval2 stmnt =
+        match stmnt with
+        | Declare str -> declare str
+        | Ass (str, a) -> prog{
+            let! a' = arithEval2 a
+            return! update str a'
+            }
+        | Skip -> (stmntEval2 stmnt)
+        | Seq (stm1, stm2) -> prog{
+            do! (stmntEval2 stm1)
+            do! (stmntEval2 stm2)
+            }
+        | ITE (guard, stm1, stm2) -> prog{
+            do! push
+            let! guard' = (boolEval2 guard)
+            return! if guard' then (stmntEval2 stm1) else (stmntEval2 stm2)
+            }
+        | While (guard, stm) -> prog{
+            let! guard' = (boolEval2 guard)
+            return! if guard' then (stmntEval2 (While (guard, stm))) else (stmntEval2 stm)
+            }
 
 (* Part 4 *) 
 
     type word = (char * int) list
     type squareFun = word -> int -> int -> Result<int, Error>
 
-    let stmntToSquareFun stm = failwith "Not implemented"
+    let stmntToSquareFun stmnt = //does not work!!!
+        (fun (word:word) (pos:int) acc ->
+            (stmntEval2 stmnt) |> evalSM (mkState [("_pos_", pos); ("_acc_", acc); ("_result_", 0)] word ["_pos_"; "_acc_";"_result_"])
+        )
 
 
     type coord = int * int
