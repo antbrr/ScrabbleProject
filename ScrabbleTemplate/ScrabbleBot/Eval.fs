@@ -81,7 +81,7 @@ module internal Eval
 
     let rec arithEval (a: aExp) : SM<int> = 
         match a with
-        | N x -> ret (x)
+        | N x -> ret x
         | V s -> lookup s 
         | WL -> wordLength
         | PV pos ->  arithEval pos >>= pointValue
@@ -94,7 +94,7 @@ module internal Eval
 
     and charEval c : SM<char> =
         match c with
-        | C c -> ret (c) (* Character value *)
+        | C c -> ret c (* Character value *)
         | CV pos -> arithEval pos >>= characterValue (* Character lookup at word index *)
         | ToUpper c -> (charEval c) >>= fun c' -> charEval (C (System.Char.ToUpper c'))
         | ToLower c -> (charEval c) >>= fun c' -> charEval (C (System.Char.ToLower c'))
@@ -102,8 +102,8 @@ module internal Eval
 
     let rec boolEval b : SM<bool> = 
         match b with
-        | TT -> ret (true)
-        | FF -> ret (false)
+        | TT -> ret true
+        | FF -> ret false
 
         | AEq (a,b) -> (arithEval a) >>= fun x -> (arithEval b) >>= fun y -> ret (x = y)
         | ALt (a,b) -> (arithEval a) >>= fun x -> (arithEval b) >>= fun y -> ret (x < y)
@@ -143,7 +143,7 @@ module internal Eval
         member this.Delay(f)      = f ()
         member this.Combine(a, b) = a >>= (fun _ -> b)
         
-    let prog = new StateBuilder()
+    let prog = StateBuilder()
 
     let rec arithEval2 a = 
         match a with
@@ -167,7 +167,7 @@ module internal Eval
 
     and charEval2 c =
         match c with
-        | C c -> ret (c)
+        | C c -> ret c
         | CV pos -> prog{
             let! pos' = (arithEval2 pos)
             return! characterValue pos'
