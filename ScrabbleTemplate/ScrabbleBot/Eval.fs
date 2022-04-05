@@ -138,7 +138,6 @@ module internal Eval
 (* Part 3 (Optional) *)
 
     type StateBuilder() =
-
         member this.Bind(f, x)    = f >>= x
         member this.Return(x)     = ret x
         member this.ReturnFrom(x) = x
@@ -147,7 +146,7 @@ module internal Eval
         
     let prog = new StateBuilder()
 
-   let rec arithEval2 a = 
+    let rec arithEval2 a = 
         match a with
         | N x -> ret x
         | V s -> lookup s 
