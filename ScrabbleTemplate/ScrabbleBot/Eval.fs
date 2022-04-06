@@ -252,16 +252,67 @@ module internal Eval
     type word = (char * int) list
     type squareFun = word -> int -> int -> Result<int, Error>
 
-    let stmntToSquareFun stmnt = //does not work!!!
+    let stmntToSquareFun stmnt =
         (fun (word:word) (pos:int) acc ->
             (stmntEval2 stmnt) |> evalSM (mkState [("_pos_", pos); ("_acc_", acc); ("_result_", 0)] word ["_pos_"; "_acc_";"_result_"])
         )
-
+       
+    let arithSingleLetterScore = PV (V "_pos_") .+. (V "_acc_")
+    let arithDoubleLetterScore = ((N 2) .*. PV (V "_pos_")) .+. (V "_acc_")
+    let arithTripleLetterScore = ((N 3) .*. PV (V "_pos_")) .+. (V "_acc_")
+    let arithDoubleWordScore = N 2 .*. V "_acc_"
+    let arithTripleWordScore = N 3 .*. V "_acc_"
+    let stmntSingleLetterScore = Ass ("_result_", arithSingleLetterScore)
+    let stmntDoubleLetterScore = Ass ("_result_", arithDoubleLetterScore)
+    let stmntTripleLetterScore = Ass ("_result_", arithTripleLetterScore)
+    let stmntDoubleWordScore = Ass ("_result_", arithDoubleWordScore)
+    let stmntTripleWordScore = Ass ("_result_", arithTripleWordScore)
+    let singleLetterScore = stmntToSquareFun stmntSingleLetterScore
+    let doubleLetterScore = stmntToSquareFun stmntDoubleLetterScore
+    let tripleLetterScore = stmntToSquareFun stmntTripleLetterScore
+    let doubleWordScore = stmntToSquareFun stmntDoubleWordScore
+    let tripleWordScore = stmntToSquareFun stmntTripleWordScore
+    let containsNumbers = 
+        stmntToSquareFun 
+            (Seq (Declare "i",
+                (Seq (Ass ("_result_", V "_acc_"),
+                        While (V "i" .<. WL,
+                        ITE (IsDigit (CV (V "i")),
+                        Seq (
+                            Ass ("_result_", V "_result_" .*. N -1),
+                            Ass ("i", WL)),
+                        Ass ("i", V "i" .+. N 1)))))))
 
     type coord = int * int
 
-    type boardFun = coord -> Result<squareFun option, Error> 
-
+    type boardFun = coord -> Result<squareFun option, Error>
+    
+    let abs v result = ITE (v .<. N 0, Ass (result, v .*. N -1), Ass (result, v))
+    let twsCheck x y = ((V x .=. N 0) .&&. (V y .=. N 7)) .||. ((V x .=. N 7) .&&. ((V y .=. N 7) .||. (V y .=. N 0)))
+    let dwsCheck x y = (V x .=. V y) .&&. (V x .<. N 7) .&&. (V x .>. N 2)
+    let tlsCheck x y = ((V x .=. N 6) .&&. (V y .=. N 2)) .||. ((V x .=. N 2) .&&. ((V y .=. N 2) .||. (V y .=. N 6)))
+    let dlsCheck x y = ((V x .=. N 0) .&&. (V y .=. N 4)) .||.
+                   ((V x .=. N 1) .&&. ((V y .=. N 1) .||. (V y .=. N 5))) .||.
+                   ((V x .=. N 4) .&&. ((V y .=. N 0) .||. (V y .=. N 7))) .||.
+                   ((V x .=. N 5) .&&. (V y .=. N 1)) .||.
+                   ((V x .=. N 7) .&&. (V y .=. N 4))
+    let insideCheck x y = ((V x .<. N 8) .&&. (V y .<. N 8))
+    let checkSquare f v els = ITE (f "xabs" "yabs", Ass ("_result_", N v), els)
+    
+    let standardBoard =
+        Seq (Declare "xabs",
+            Seq (Declare "yabs",
+                Seq (abs (V "_x_") "xabs",
+                    Seq (abs (V "_y_") "yabs",
+                            checkSquare twsCheck 4 
+                                (checkSquare dwsCheck 3 
+                                    (checkSquare tlsCheck 2 
+                                        (checkSquare dlsCheck 1
+                                            (checkSquare insideCheck 0
+                                                (Ass ("_result_", N -1))))))))))
+                                           
+    let boardMap = [(0, singleLetterScore); (1, doubleLetterScore); (2, tripleLetterScore); 
+                    (3, doubleWordScore); (4, tripleWordScore)] |> Map.ofList
     let stmntToBoardFun stm m = failwith "Not implemented"
 
     type board = {
