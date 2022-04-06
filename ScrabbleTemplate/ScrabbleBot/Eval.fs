@@ -2,6 +2,7 @@
 
 module internal Eval
 
+    open System.Data.SqlTypes
     open StateMonad
     let add (a:SM<int>) (b:SM<int>) = 
         a >>= fun x -> 
@@ -313,7 +314,11 @@ module internal Eval
                                            
     let boardMap = [(0, singleLetterScore); (1, doubleLetterScore); (2, tripleLetterScore); 
                     (3, doubleWordScore); (4, tripleWordScore)] |> Map.ofList
-    let stmntToBoardFun stm m = failwith "Not implemented"
+    let stmntToBoardFun (stm: stm) (m: Map<int, squareFun>) : boardFun =
+        fun (x,y) ->
+            let state = mkState [("_x_", x);("_y_", y); ("_result_", 0)] list.Empty ["_x_"; "_y_"; "_result_"]
+            let sm = stmntEval2 stm >>>= lookup "_result_" >>= (fun n -> ret (Map.tryFind n m))
+            evalSM state sm
 
     type board = {
         center        : coord
