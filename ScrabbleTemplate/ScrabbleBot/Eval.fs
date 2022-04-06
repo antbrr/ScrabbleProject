@@ -2,7 +2,6 @@
 
 module internal Eval
 
-    open System.Data.SqlTypes
     open StateMonad
     let add (a:SM<int>) (b:SM<int>) = 
         a >>= fun x -> 
@@ -253,10 +252,11 @@ module internal Eval
     type word = (char * int) list
     type squareFun = word -> int -> int -> Result<int, Error>
 
-    let stmntToSquareFun stmnt =
-        (fun (word:word) (pos:int) acc ->
-            (stmntEval2 stmnt) |> evalSM (mkState [("_pos_", pos); ("_acc_", acc); ("_result_", 0)] word ["_pos_"; "_acc_";"_result_"])
-        )
+    let stmntToSquareFun (stm:stm): squareFun =
+        fun (word:word) (pos:int) acc ->
+            let state = mkState [("_pos_", pos); ("_acc_", acc); ("_result_", 0)] word ["_pos_"; "_acc_";"_result_"]
+            let sm = stmntEval2 stm >>>= lookup "_result_"
+            evalSM state sm
        
     let arithSingleLetterScore = PV (V "_pos_") .+. (V "_acc_")
     let arithDoubleLetterScore = ((N 2) .*. PV (V "_pos_")) .+. (V "_acc_")
@@ -292,11 +292,12 @@ module internal Eval
     let twsCheck x y = ((V x .=. N 0) .&&. (V y .=. N 7)) .||. ((V x .=. N 7) .&&. ((V y .=. N 7) .||. (V y .=. N 0)))
     let dwsCheck x y = (V x .=. V y) .&&. (V x .<. N 7) .&&. (V x .>. N 2)
     let tlsCheck x y = ((V x .=. N 6) .&&. (V y .=. N 2)) .||. ((V x .=. N 2) .&&. ((V y .=. N 2) .||. (V y .=. N 6)))
-    let dlsCheck x y = ((V x .=. N 0) .&&. (V y .=. N 4)) .||.
-                   ((V x .=. N 1) .&&. ((V y .=. N 1) .||. (V y .=. N 5))) .||.
-                   ((V x .=. N 4) .&&. ((V y .=. N 0) .||. (V y .=. N 7))) .||.
-                   ((V x .=. N 5) .&&. (V y .=. N 1)) .||.
-                   ((V x .=. N 7) .&&. (V y .=. N 4))
+    let dlsCheck x y =
+        ((V x .=. N 0) .&&. (V y .=. N 4)) .||.
+        ((V x .=. N 1) .&&. ((V y .=. N 1) .||. (V y .=. N 5))) .||.
+        ((V x .=. N 4) .&&. ((V y .=. N 0) .||. (V y .=. N 7))) .||.
+        ((V x .=. N 5) .&&. (V y .=. N 1)) .||.
+        ((V x .=. N 7) .&&. (V y .=. N 4))
     let insideCheck x y = ((V x .<. N 8) .&&. (V y .<. N 8))
     let checkSquare f v els = ITE (f "xabs" "yabs", Ass ("_result_", N v), els)
     
@@ -325,5 +326,11 @@ module internal Eval
         defaultSquare : squareFun
         squares       : boardFun
     }
-
-    let mkBoard c defaultSq boardStmnt ids = failwith "Not implemented"
+    let mkBoard (c:coord) (defaultSq:stm) (boardStmnt:stm) (ids:(int*stm) list): board =
+         let intToSquareFun:Map<int, squareFun> =
+             List.fold (fun acc (id, stm) -> Map.add id (stmntToSquareFun stm) acc) Map.empty ids
+         {
+         center = c
+         defaultSquare = stmntToSquareFun defaultSq
+         squares = stmntToBoardFun boardStmnt intToSquareFun
+         }
