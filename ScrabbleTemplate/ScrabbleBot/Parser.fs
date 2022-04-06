@@ -1,5 +1,5 @@
 ﻿// ScrabbleUtil contains the types coord, boardProg, and SquareProg. Remove these from your file before proceeding.
-// Also note that the modulse Ass7 and ImpParser have been merged to one module called Parser.
+// Also note that the modules Ass7 and ImpParser have been merged to one module called Parser.
 
 // Insert your Parser.fs file here from Assignment 7. All modules must be internal.
 

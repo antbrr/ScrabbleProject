@@ -3,6 +3,7 @@
 module internal Eval
 
     open StateMonad
+    open ScrabbleUtil
     let add (a:SM<int>) (b:SM<int>) = 
         a >>= fun x -> 
         b >>= fun y -> 
@@ -334,3 +335,6 @@ module internal Eval
          defaultSquare = stmntToSquareFun defaultSq
          squares = stmntToBoardFun boardStmnt intToSquareFun
          }
+         
+    
+    
